@@ -1,8 +1,11 @@
 import requests
 
 #BASE_URL = "https://repositorio.ufcspa.edu.br/server/api"
-BASE_URL = "https://repositorio.unipampa.edu.br/server/api"
-def obter_handles_recentes():
+#BASE_URLS = ["https://repositorio.unipampa.edu.br", "https://repositorio.ufcspa.edu.br"]
+BASE_URLS = open("input-dspace7+.txt").read().splitlines()
+API_URL = "/server/api"
+def obter_handles_recentes(base_url:str):
+    file = open(f"results/{base_url.removeprefix("https://").removeprefix("http://").replace('/', '-')}.txt", "w")
     params = {
         "query": "*",
         "dsoType": "ITEM",
@@ -12,7 +15,7 @@ def obter_handles_recentes():
     }
 
     r = requests.get(
-        f"{BASE_URL}/discover/search/objects",
+        f"{base_url + API_URL}/discover/search/objects",
         params=params,
         headers={"Accept": "application/json"}
     )
@@ -26,7 +29,7 @@ def obter_handles_recentes():
         .get("_embedded", {})
         .get("objects", [])
     )
-
+    result = []
     for obj in objetos:
         item = obj["_embedded"]["indexableObject"]
 
@@ -34,7 +37,7 @@ def obter_handles_recentes():
         uuid = item["uuid"]
 
         item_resp = requests.get(
-            f"{BASE_URL}/core/items/{uuid}",
+            f"{base_url+API_URL}/core/items/{uuid}",
             headers={"Accept": "application/json"}
         )
         item_resp.raise_for_status()
@@ -42,8 +45,10 @@ def obter_handles_recentes():
         item_json = item_resp.json()
 
         handle = item_json.get("handle")
-
+        result.append(f"{base_url+ '/handle/' +handle}")
         print(f"{handle} - {titulo}")
-
+    file.writelines([f"{item}\n" for item in result])
+    file.close()
 if __name__ == "__main__":
-    obter_handles_recentes()
+    for url in BASE_URLS:
+        obter_handles_recentes(url)
