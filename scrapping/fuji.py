@@ -6,13 +6,20 @@ url = "http://localhost:1071/fuji/api/v1/evaluate"
 fileList = os.listdir("results")
 print(fileList)
 def run():
-    
+    fileList.remove('fuji')
     for file in fileList:
-    
         lines = open(f"results/{file}").read().splitlines()
-        #print(lines)
+        
+        print(lines)
         result = []
+        resultFile = None
+        try:
+            os.mkdir(f"results/fuji")
+        except FileExistsError:
+            pass
+        
         resultFile = open(f"results/fuji/{file}_output.json", "w")
+       
         for handle in lines:
             
             print(f"Processing {handle}")

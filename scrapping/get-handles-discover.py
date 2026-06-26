@@ -1,4 +1,7 @@
 import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 #BASE_URL = "https://repositorio.ufcspa.edu.br/server/api"
 #BASE_URLS = ["https://repositorio.unipampa.edu.br", "https://repositorio.ufcspa.edu.br"]
@@ -17,7 +20,8 @@ def obter_handles_recentes(base_url:str):
     r = requests.get(
         f"{base_url + API_URL}/discover/search/objects",
         params=params,
-        headers={"Accept": "application/json"}
+        headers={"Accept": "application/json"},
+        verify=False
     )
 
     r.raise_for_status()
@@ -38,7 +42,7 @@ def obter_handles_recentes(base_url:str):
 
         item_resp = requests.get(
             f"{base_url+API_URL}/core/items/{uuid}",
-            headers={"Accept": "application/json"}
+            headers={"Accept": "application/json"}, verify=False
         )
         item_resp.raise_for_status()
 

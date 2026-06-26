@@ -16,7 +16,7 @@ def extrair_handles_recentes(url_busca, max_paginas=5):
     
     pagina_atual = 1
     offset = 0  
-    padrao_handle = re.compile(r'handle/\d+/\d+')
+    #padrao_handle = re.compile(r'handle/')
 
     print(f"Iniciando raspagem cronológica decrescente para: {url_busca}")
     print("-" * 50)
@@ -32,24 +32,32 @@ def extrair_handles_recentes(url_busca, max_paginas=5):
             if resposta.status_code != 200:
                 print(f"Erro HTTP {resposta.status_code} ao acessar a página.")
                 break
-                
+            
             soup = BeautifulSoup(resposta.content, 'html.parser')
-            
+            #print(f"Soup resultado: {soup}")
             links = soup.find_all('a', href=True)
-            
+            print(f"Links encontrados nesta página: {len(links)}")
             novos_handles_na_pagina = 0
             
             for link in links:
                 href = link['href']
+                #print(f"Verificando link: {href}")
+                if 'jspui' in href:
+                    href = href.split('jspui')[1] 
+                elif 'xmlui' in href:
+                    href = href.split('xmlui')[1]
+                elif 'riuff' in href:
+                    href = href.split('riuff')[1]
                 if 'handle/' in href:
-                    resultado = padrao_handle.search(href)
-                    if resultado:
-                        url_handle_completa = f"{URL_BASE.split(';')[0]}/{resultado.group(0)}"
-                        
-                        if url_handle_completa not in handles_unicos_controle:
-                            handles_unicos_controle.add(url_handle_completa)
-                            handles_coletados.append(url_handle_completa)
-                            novos_handles_na_pagina += 1
+                    #resultado = padrao_handle.search(href)
+                    #print(f"Resultado da regex: {resultado}")
+                    #if resultado:
+                    url_handle_completa = f"{URL_BASE.split(';')[0]}/{href.lstrip('/')}"
+                    print(f"Handle encontrado: {url_handle_completa}")
+                    if url_handle_completa not in handles_unicos_controle:
+                        handles_unicos_controle.add(url_handle_completa)
+                        handles_coletados.append(url_handle_completa)
+                        novos_handles_na_pagina += 1
 
             print(f"Handles encontrados nesta página: {novos_handles_na_pagina}")
             print(f"Total acumulado: {len(handles_coletados)} handles únicos em ordem decrescente.")
