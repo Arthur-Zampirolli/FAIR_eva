@@ -38,11 +38,18 @@ def run():
                 'Authorization': 'Basic bWFydmVsOndvbmRlcndvbWFu',
                 'Content-Type': 'application/json'
             }
-
-            response = requests.request("POST", url, headers=headers, data=payload)
-            temp = json.loads(response.text)
-            print(response.text)
-            result.append(temp)
+            try:
+                response = requests.request("POST", url, headers=headers, data=payload)
+                temp = json.loads(response.text)
+                print(response.text)
+                result.append(temp)
+            except Exception as e:
+                print(f"Error processing {handle}: {e}")
+                continue
+            #response = requests.request("POST", url, headers=headers, data=payload)
+            #temp = json.loads(response.text)
+            #print(response.text)
+            #result.append(temp)
         json.dump(result, resultFile, indent=4)
         resultFile.close()
         
