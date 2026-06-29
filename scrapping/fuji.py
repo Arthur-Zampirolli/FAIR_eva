@@ -3,12 +3,15 @@ import json
 import os
 url = "http://localhost:1071/fuji/api/v1/evaluate"
 
-fileList = os.listdir("results")
+fileList = os.listdir("results/temp")
 print(fileList)
 def run():
-    fileList.remove('fuji')
+    try:
+        fileList.remove('fuji')
+    except ValueError:
+        pass
     for file in fileList:
-        lines = open(f"results/{file}").read().splitlines()
+        lines = open(f"results/temp/{file}").read().splitlines()
         
         print(lines)
         result = []
